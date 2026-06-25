@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CYBER GUARDIAN ROBOT: ตะลุยด่านไซเบอร์พาสนุก ป.5</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Mitr:wght@300;400;500;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050811;
+            font-family: 'Mitr', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameWrapper {
+            position: relative;
+            width: 1024px;
+            height: 576px;
+            background: #070b15;
+            box-shadow: 0 0 50px rgba(0, 168, 255, 0.4);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 4px solid #00a8ff;
+            transition: width 0.2s, height 0.2s;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        /* Sci-Fi Futuristic Custom CSS Modals */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 17, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .modal-content {
+            background: rgba(13, 20, 38, 0.96);
+            border: 4px solid #00a8ff;
+            border-radius: 35px;
+            padding: 35px 40px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0, 168, 255, 0.5);
+            animation: holoPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #f1f5f9;
+        }
+
+        @keyframes holoPopIn {
+            0% { transform: scale(0.7) translateY(40px); opacity: 0; filter: hue-rotate(-90deg); }
+            100% { transform: scale(1) translateY(0); opacity: 1; filter: hue-rotate(0deg); }
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #00a8ff;
+            margin-bottom: 12px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(0, 168, 255, 0.6);
+            letter-spacing: 1.5px;
+        }
+
+        p {
+            font-size: 15px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #00d2ff 0%, #00a8ff 100%);
+            border: 3px solid #fff;
+            padding: 14px 44px;
+            font-size: 20px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: bold;
+            color: #050811;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(0, 168, 255, 0.4);
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(0, 210, 255, 0.6);
+            background: linear-gradient(135deg, #00a8ff 0%, #00d2ff 100%);
+        }
+
+        .btn-premium:active {
+            transform: translateY(1px);
+        }
+
+        /* Touch/Click Controls HUD */
+        #touchControls {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            width: 100%;
+            display: none;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .touch-btn-group {
+            display: flex;
+            gap: 20px;
+            pointer-events: auto;
+        }
+
+        .touch-btn {
+            width: 76px;
+            height: 76px;
+            background: rgba(13, 20, 38, 0.9);
+            border: 3px solid #00a8ff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            color: #00a8ff;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .touch-btn:active {
+            background: #00a8ff;
+            color: #050811;
+            transform: scale(0.88);
+            box-shadow: 0 0 25px #00a8ff;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (pointer: coarse) {
+            #touchControls {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="gameWrapper">
+    <!-- Start Modal -->
+    <div id="startModal" class="modal-overlay">
+        <div class="modal-content">
+            <h1>⚡ CYBER GUARDIAN ROBOT ⚡</h1>
+            <p style="font-weight: 600; color: #00d2ff; font-size: 18px; font-family: 'Chakra Petch';">ผู้พิทักษ์ข้อมูลไซเบอร์ ป.5 (ว 4.2 ป.5/5)</p>
+            <p>ควบคุมหุ่นยนต์ไซเบอร์สุดไฮเทคออกเดินทางกอบกู้ความปลอดภัยของข้อมูล ชาร์จพลังงานและสกัดกั้นภัยคุกคาม มารยาทไซเบอร์ การป้องกันตัวจากการข่มขู่ ลิงก์ฟิชชิ่ง และผู้ไม่ประสงค์ดีบนอินเทอร์เน็ตไปด้วยกัน! 🤖🛰️</p>
+            <button class="btn-premium" onclick="startGame()">เปิดระบบปฏิบัติการ ➔</button>
+        </div>
+    </div>
+
+    <!-- Game Over / Victory Modal -->
+    <div id="gameOverModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h1 id="modalTitle">🚨 รายงานภารกิจ 🚨</h1>
+            <p id="modalScore" style="font-size: 24px; font-weight: bold; color: #ff7675; font-family: 'Chakra Petch';"></p>
+            <p id="modalHighScore" style="font-size: 16px; color: #00b894; margin-top: -10px; font-weight: bold;"></p>
+            <p id="modalRank" style="font-size: 20px; font-weight: bold; color: #f1c40f; margin-bottom: 15px; font-family: 'Chakra Petch';"></p>
+            <p id="modalDesc"></p>
+            <button class="btn-premium" onclick="restartGame()">เริ่มภารกิจใหม่ 🤖</button>
+        </div>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" width="1024" height="576"></canvas>
+
+    <!-- Mobile Screen Controls -->
+    <div id="touchControls">
+        <div class="touch-btn-group">
+            <div class="touch-btn" id="btnLeft">◀</div>
+            <div class="touch-btn" id="btnRight">▶</div>
+        </div>
+        <div class="touch-btn-group">
+            <div class="touch-btn" id="btnJump" style="border-color: #ff7675; color: #ff7675;">▲</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Thai Educational Dataset ว 4.2 ป.5/5 (คลังคำถาม 16 ข้อ พร้อมตัวคั่นตัดคำภาษาไทย | เพื่อการตัดคำที่สมบูรณ์แบบ) ---
+    const questionBank = [
+        { q: "มีคนทักแชตมาบอกว่าเป็นคนรู้จักของพ่อแม่|แล้วขอนัดเจอเพื่อนๆ ข้างนอก?", a: "ปฏิเสธทันที|และบอกให้ผู้ปกครองทราบ", b: ["นัดเจอในสถานที่|ลับตาคน", "แอบไปพบเพื่อลองดู|ว่าเป็นใครกันแน่"] },
+        { q: "เมื่อพบเห็นโพสต์ล้อเลียนปมด้อยของเพื่อน|(Cyberbully) ควรปฏิบัติอย่างไรจึงจะเหมาะสม?", a: "แจ้งคุณครูหรือผู้ใหญ่|ให้ช่วยตักเตือน", b: ["กดถูกใจและแชร์ต่อ|ให้คนอื่นร่วมขำตาม", "ร่วมเขียนคอมเมนต์|ล้อเลียนเพื่อนซ้ำเติม"] },
+        { q: "พฤติกรรมใดเสี่ยงต่อการโดนมัลแวร์|หรือถูกหลอกเอาข้อมูลไปสร้างความเสียหาย?", a: "คลิกลิงก์แปลก ๆ|จากแชตคนไม่รู้จัก", b: ["ใช้เว็บสืบค้นข้อมูล|ทำการบ้านส่งคุณครู", "เปลี่ยนรหัสผ่านอีเมล|ให้รัดกุมทุก 3 เดือน"] },
+        { q: "หากต้องการตั้งรหัสผ่านให้มีความปลอดภัย|และคาดเดาได้ยากมากที่สุด?", a: "ผสมอักษรใหญ่ เล็ก|ตัวเลข และสัญลักษณ์", b: ["ใช้หมายเลขโทรศัพท์|หรือวันเกิดตนเอง", "ตั้งรหัสผ่านอย่างง่าย|เช่น 12345678"] },
+        { q: "ข้อมูลสำคัญประเภทใดที่เด็กๆ ไม่ควร|นำไปโพสต์เปิดเผยบนสื่อสังคมออนไลน์?", a: "ที่อยู่บ้าน เบอร์โทร|และเลขบัตรประชาชน", b: ["รูปภาพอาหารกลางวัน|จานโปรดที่ชอบทาน", "วิชาเรียนและหนังสือ|การ์ตูนที่ชื่นชอบ"] },
+        { q: "ถ้าได้รับข้อความแจ้งเตือนแปลกๆ ว่า|'คุณคือผู้โชคดีถูกรางวัล คลิกรับเงินด่วน'?", a: "ลบข้อความทิ้งทันที|เพราะเป็นเว็บหลอกลวง", b: ["รีบกดลิงก์ทันที|เพื่อรักษาลิขสิทธิ์รางวัล", "ส่งต่อให้เพื่อนทุกคน|มาร่วมกรอกข้อมูล"] },
+        { q: "เมื่อใช้งานอินเทอร์เน็ตที่ห้องคอมพิวเตอร์|ของโรงเรียนหรือร้านค้าเสร็จเรียบร้อยแล้ว?", a: "กดออกจากระบบ (Log Out)|จากทุกบัญชีเสมอ", b: ["ปิดหน้าจอคอมพิวเตอร์|ไปเลยโดยไม่ต้องกดออก", "กดบันทึกรหัสผ่านไว้|เผื่อกลับมาใช้ใหม่"] },
+        { q: "มีผู้เล่นคนอื่นในเกมทักมาขอข้อมูลรหัสผ่าน|บัญชีไอดีเกมของคุณเพื่อแลกเปลี่ยนของ?", a: "ปฏิเสธทันที|และแจ้งผู้ปกครองให้ทราบ", b: ["ยอมบอกเพื่อให้ได้|ร่วมแบ่งปันไอเทมหายาก", "แลกเปลี่ยนรหัสผ่าน|กับไอดีเกมของอีกฝ่าย"] },
+        { q: "การขออนุญาตเพื่อนก่อนโพสต์ภาพถ่ายร่วมกัน|ถือเป็นการปฏิบัติตนอย่างไร?", a: "เคารพสิทธิ|ความเป็นส่วนตัว|ของผู้อื่น", b: ["ทำให้เรื่องปกติ|กลายเป็นเรื่องยุ่งยาก", "แสดงความไม่มั่นใจ|ในตัวเองให้เห็น"] },
+        { q: "หากพบเห็นข้อมูลเท็จ ข้อมูลที่ทำร้ายจิตใจ|หรือสื่อที่ไม่เหมาะสมบนโซเชียลมีเดีย?", a: "รายงานผู้ดูแล (Report)|หรือแจ้งผู้ปกครองทันที", b: ["กดแชร์กระจายข่าว|เพื่อให้คนรับรู้รวดเร็ว", "นิ่งเฉยปล่อยผ่านไป|เหมือนไม่มีอะไรเกิดขึ้น"] },
+        { q: "การรับข้อมูลข่าวสารทางสื่อสังคมออนไลน์|อย่างเหมาะสมและปลอดภัย ควรยึดหลักข้อใด?", a: "เช็กความถูกต้อง|จากแหล่งข่าวทางการ|ก่อนจะเชื่อและส่งต่อ", b: ["เชื่อทันทีและรีบแชร์|เพื่อเตือนภัยเร่งด่วน", "เลือกเชื่อถือเฉพาะ|ข่าวที่มียอดคนแชร์เยอะ"] },
+        { q: "หากมีผู้ไม่ประสงค์ดีมาโพสต์ข้อความ|สร้างความเสียหายและทำลายชื่อเสียงของคุณ?", a: "แคปหลักฐาน บล็อก|และแจ้งครูหรือผู้ปกครอง", b: ["เขียนโพสต์ตอบกลับ|ด่าทอด้วยถ้อยคำรุนแรง", "ทำใจยอมรับและทน|เก็บความกังวลไว้เงียบๆ"] },
+        { q: "การเปิดสิทธิ์เข้าถึงพิกัดที่ตั้ง (GPS)|บนอุปกรณ์พกพาควรทำอย่างไรจึงจะปลอดภัย?", a: "อนุญาตเฉพาะแอปแผนที่|ขณะเปิดใช้งานเท่านั้น", b: ["เปิดตลอดเวลาเพื่อให้|ทุกแอปในเครื่องเข้าถึง", "ปิดการใช้งานทั้งหมด|แม้ตอนที่กำลังหลงทาง"] },
+        { q: "สิ่งสำคัญที่ควรทำเป็นอันดับแรก|เมื่อคิดจะซื้อของเล่นหรือสินค้าออนไลน์?", a: "ปรึกษาผู้ปกครอง|เพื่อช่วยตรวจสอบร้านค้า", b: ["รีบโอนเงินไปทันที|เพราะกลัวสินค้าหมด", "ส่งรูปบัตรประชาชน|เพื่อขอจองสินค้าไว้ก่อน"] },
+        { q: "วิธีป้องกันตนเองจากผู้ไม่ประสงค์ดี|เมื่อจำเป็นต้องเชื่อมต่อ Wi-Fi สาธารณะฟรี?", a: "หลีกเลี่ยงการแชร์ข้อมูล|หรือล็อกอินบัญชีสำคัญ", b: ["เปิดการเชื่อมต่อทิ้งไว้|และส่งข้อมูลตามปกติ", "ดาวน์โหลดโปรแกรมช่วย|รักษาความเร็วที่เด้งเตือน"] },
+        { q: "หากเห็นเพื่อนสนิทโพสต์ข้อความเชิงระบายเศร้า|และมีความเสี่ยงที่จะทำอันตรายต่อตนเอง?", a: "ทักแชตไปให้กำลังใจ|และรีบแจ้งครูหรือผู้ปกครอง", b: ["คอมเมนต์แซวตลกๆ|เพื่อให้เพื่อนคลายเครียด", "เพิกเฉยไม่สนใจ|เพราะคิดว่าแกล้งทำเล่น"] }
+    ];
+
+    // --- Safe High Score Persistent (Iframe sandbox support) ---
+    let highScore = 0;
+    try {
+        if (typeof window.localStorage !== 'undefined') {
+            const stored = localStorage.getItem('cyber_guardian_highscore');
+            highScore = stored ? parseInt(stored) : 0;
+        }
+    } catch (e) {
+        console.warn("ไม่สามารถเชื่อมต่อ LocalStorage ได้ ทำการสลับมาใช้หน่วยความจำจำลอง", e);
+    }
+
+    // --- older browsers fallback shapes ---
+    function fillRoundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        if (ctx.roundRect) {
+            ctx.roundRect(x, y, width, height, radius);
+        } else {
+            if (width < 2 * radius) radius = width / 2;
+            if (height < 2 * radius) radius = height / 2;
+            ctx.moveTo(x + radius, y);
+            ctx.arcTo(x + width, y, x + width, y + height, radius);
+            ctx.arcTo(x + width, y + height, x, y + height, radius);
+            ctx.arcTo(x, y + height, x, y, radius);
+            ctx.arcTo(x, y, x + width, y, radius);
+            ctx.closePath();
+        }
+        ctx.fill();
+    }
+
+    function strokeRoundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        if (ctx.roundRect) {
+            ctx.roundRect(x, y, width, height, radius);
+        } else {
+            if (width < 2 * radius) radius = width / 2;
+            if (height < 2 * radius) radius = height / 2;
+            ctx.moveTo(x + radius, y);
+            ctx.arcTo(x + width, y, x + width, y + height, radius);
+            ctx.arcTo(x + width, y + height, x, y + height, radius);
+            ctx.arcTo(x, y + height, x, y, radius);
+            ctx.arcTo(x, y, x + width, y, radius);
+            ctx.closePath();
+        }
+        ctx.stroke();
+    }
+
+    // --- Web Audio API Synthesizer (8-bit Sound Generator) ---
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    function playSound(type, combo = 0) {
+        try {
+            initAudio();
+            if (!audioCtx || audioCtx.state === 'suspended') return;
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'jump') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(550, now + 0.12);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } else if (type === 'star') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(587.33, now); // D5
+                osc.frequency.setValueAtTime(880.00, now + 0.08); // A5
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'shield') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(330, now);
+                osc.frequency.exponentialRampToValueAtTime(660, now + 0.25);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'correct') {
+                osc.type = 'square';
+                const base = 480 + (combo * 50);
+                osc.frequency.setValueAtTime(base, now);
+                osc.frequency.setValueAtTime(base * 1.2, now + 0.08);
+                osc.frequency.setValueAtTime(base * 1.5, now + 0.16);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'hurt') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.linearRampToValueAtTime(55, now + 0.4);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            }
+        } catch (e) {
+            console.log("Audio load failure:", e);
+        }
+    }
+
+    // --- Game Variables & Configurations ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let gameState = 'START';
+    let score = 0;
+    let lives = 3;
+    let comboCount = 0;
+    let currentQuestion = "";
+    let answeredQuestionsCount = 0;
+    const totalQuestionsToWin = 10;
+    let hasShield = false;
+
+    let shakeTimer = 0;
+    let shakeIntensity = 0;
+
+    let bgGradientCache = null;
+
+    let platforms = [];
+    let clouds = [];
+    let particles = [];
+    let stars = [];
+    let shields = [];
+    let bubbles = [];
+    let floatingTexts = [];
+
+    const keys = { left: false, right: false, up: false };
+
+    // Cyber Robot Character
+    const player = {
+        x: 150,
+        y: 200,
+        width: 42,
+        height: 54,
+        vx: 0,
+        vy: 0,
+        isGrounded: false,
+        jumpCount: 0,
+        facing: 'right',
+        hurtTimer: 0,
+        expression: 'normal', // normal, happy, hurt
+        expressionTimer: 0,
+        lastSafeX: 150,
+        lastSafeY: 350
+    };
+
+    let cameraX = 0;
+    let platformCounter = 0;
+
+    // Build Cozy Space Background Gradients on bootup
+    function buildGradients() {
+        bgGradientCache = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        bgGradientCache.addColorStop(0, '#070a13'); // space sky depth
+        bgGradientCache.addColorStop(1, '#0f172a'); // blue slate space
+    }
+    buildGradients();
+
+    // --- Inputs Handlers ---
+    window.addEventListener('keydown', e => {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') {
+            if (!keys.up) triggerJump();
+            keys.up = true;
+        }
+    });
+
+    window.addEventListener('keyup', e => {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') keys.up = false;
+    });
+
+    function bindInteractive(id, keyProp) {
+        const btn = document.getElementById(id);
+        
+        const startAction = (e) => {
+            e.preventDefault();
+            initAudio();
+            if (keyProp === 'up') triggerJump();
+            else keys[keyProp] = true;
+        };
+
+        const endAction = (e) => {
+            e.preventDefault();
+            if (keyProp !== 'up') keys[keyProp] = false;
+        };
+
+        btn.addEventListener('touchstart', startAction, {passive: false});
+        btn.addEventListener('touchend', endAction, {passive: false});
+        btn.addEventListener('mousedown', startAction);
+        btn.addEventListener('mouseup', endAction);
+    }
+    bindInteractive('btnLeft', 'left');
+    bindInteractive('btnRight', 'right');
+    bindInteractive('btnJump', 'up');
+
+    // --- Init World States ---
+    function initGame() {
+        score = 0;
+        lives = 3;
+        comboCount = 0;
+        cameraX = 0;
+        platformCounter = 0;
+        answeredQuestionsCount = 0;
+        currentQuestion = "";
+        hasShield = false;
+
+        platforms = [];
+        clouds = [];
+        particles = [];
+        stars = [];
+        shields = [];
+        bubbles = [];
+        floatingTexts = [];
+
+        player.x = 150;
+        player.y = 200;
+        player.vx = 0;
+        player.vy = 0;
+        player.expression = 'normal';
+
+        // Spawn first platform
+        platforms.push({ x: 0, y: 420, width: 550, height: 200, type: 'normal', decorations: [] });
+        player.lastSafeX = 150;
+        player.lastSafeY = 420 - player.height;
+
+        // Space Station deco
+        for (let i = 0; i < 6; i++) {
+            clouds.push({
+                x: Math.random() * canvas.width * 2,
+                y: 50 + Math.random() * 100,
+                scale: 0.6 + Math.random() * 0.5,
+                speed: 0.15 + Math.random() * 0.2
+            });
+        }
+
+        // Star vector points
+        for (let i = 0; i < 30; i++) {
+            particles.push({
+                type: 'cyber-star',
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: 1 + Math.random() * 2,
+                pulseSpeed: 0.01 + Math.random() * 0.03,
+                rad: Math.random() * Math.PI
+            });
+        }
+
+        // Spawn 15 initial platforms ahead
+        for (let i = 0; i < 15; i++) {
+            generateNextPlatform();
+        }
+    }
+
+    function generateNextPlatform() {
+        platformCounter++;
+        let lastPlat = platforms[platforms.length - 1];
+        
+        let gap = 75 + Math.random() * 45; // Safe gaps
+        let width = 180 + Math.random() * 80;
+        let yOffset = (Math.random() - 0.5) * 55;
+        let nextY = lastPlat.y + yOffset;
+
+        if (nextY > 480) nextY = 480;
+        if (nextY < 260) nextY = 260;
+
+        let nextX = lastPlat.x + lastPlat.width + gap;
+        let type = 'normal';
+
+        // Expanded platform width for question stations to accommodate spread bubbles
+        if (platformCounter % 3 === 0 && answeredQuestionsCount < totalQuestionsToWin) {
+            type = 'question';
+            width = 520; // Increased significantly to 520 for plenty of bubble spacing!
+        }
+
+        let decors = [];
+        let numDecors = Math.floor(Math.random() * 3);
+        for(let d = 0; d < numDecors; d++) {
+            decors.push({
+                type: 'antenna',
+                rx: 20 + Math.random() * (width - 40),
+                height: 15 + Math.random() * 20,
+                color: ['#00d2ff','#0984e3','#f1c40f','#6c5ce7'][Math.floor(Math.random()*4)]
+            });
+        }
+
+        platforms.push({ x: nextX, y: nextY, width: width, height: 250, type: type, decorations: decors });
+
+        if (type === 'normal') {
+            if (Math.random() > 0.3) {
+                stars.push({ x: nextX + width/2, y: nextY - 50 - Math.random()*30, collected: false });
+            }
+            if (Math.random() < 0.15 && !hasShield) {
+                shields.push({ x: nextX + width / 4, y: nextY - 60, collected: false });
+            }
+        } else if (type === 'question') {
+            let qData = questionBank[Math.floor(Math.random() * questionBank.length)];
+            let choices = [{ text: qData.a, isCorrect: true }];
+            qData.b.forEach(bt => choices.push({ text: bt, isCorrect: false }));
+            choices.sort(() => Math.random() - 0.5);
+
+            let spacing = width / (choices.length + 1); // Expanded centers
+            for (let c = 0; c < choices.length; c++) {
+                // Adjusted staggered height slightly to avoid clashing with the raised question box
+                let staggeredY = nextY - 95;
+                if (c === 1) {
+                    staggeredY = nextY - 125; // Float the middle choice slightly higher but safely below the panel
+                }
+
+                bubbles.push({
+                    x: nextX + spacing * (c + 1),
+                    y: staggeredY,
+                    text: choices[c].text,
+                    isCorrect: choices[c].isCorrect,
+                    questionText: qData.q,
+                    color: ['#ffccd5', '#d8f3dc', '#caf0f8'][c % 3],
+                    glowColor: ['#ff7675', '#2ed573', '#00a8ff'][c % 3],
+                    wobbleSeed: Math.random() * 100,
+                    stationX: nextX
+                });
+            }
+        }
+    }
+
+    function spawnSakuraPetal(x, y) {
+        particles.push({
+            type: 'digital-petal',
+            x: x,
+            y: y,
+            size: 5 + Math.random() * 4,
+            vy: 1.0 + Math.random() * 1.2,
+            vx: -0.2 + Math.random() * 0.4,
+            angle: Math.random() * Math.PI,
+            spinSpeed: 0.02 + Math.random() * 0.03,
+            color: Math.random() > 0.5 ? '#00d2ff' : '#00a8ff'
+        });
+    }
+
+    // Smart Thai Text Wrap split by '|' character for absolutely perfect word-wrap results inside bubbles
+    function drawBubbleText(ctx, text, x, y) {
+        ctx.fillStyle = "#050811"; // Very dark charcoal black for perfect crisp contrast
+        ctx.font = "bold 13.5px 'Mitr'"; // Bolder and larger font
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        let lines = text.split('|');
+        let lineHeight = 16;
+        let startY = y - ((lines.length - 1) * lineHeight) / 2;
+        for (let i = 0; i < lines.length; i++) {
+            ctx.fillText(lines[i], x, startY + i * lineHeight);
+        }
+    }
+
+    function spawnSmoke(x, y) {
+        for(let i=0; i<10; i++){
+            particles.push({
+                type: 'smoke',
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 3 + 2,
+                radius: 5 + Math.random() * 6,
+                alpha: 1,
+                decay: 0.04 + Math.random()*0.03,
+                color: comboCount >= 3 ? '#ff3f34' : '#00a8ff'
+            });
+        }
+    }
+
+    function spawnJetSparks(x, y) {
+        for (let i = 0; i < 2; i++) {
+            particles.push({
+                type: 'spark',
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * 2,
+                vy: 1.5 + Math.random() * 2,
+                size: 2 + Math.random() * 2,
+                alpha: 1,
+                decay: 0.06
+            });
+        }
+    }
+
+    function addFloatingText(x, y, str, styleColor = '#fff') {
+        floatingTexts.push({ x: x, y: y, text: str, vy: -1.4, alpha: 1, color: styleColor });
+    }
+
+    function triggerJump() {
+        if (player.isGrounded) {
+            player.vy = -12.5;
+            player.isGrounded = false;
+            player.jumpCount = 1;
+            player.expression = 'happy';
+            player.expressionTimer = 30;
+            spawnSmoke(player.x + player.width/2, player.y + player.height - 4);
+            playSound('jump');
+        } else if (player.jumpCount === 1) {
+            player.vy = -11.0;
+            player.jumpCount = 2;
+            player.expression = 'happy';
+            player.expressionTimer = 35;
+            spawnSmoke(player.x + player.width/2, player.y + player.height - 4);
+            playSound('jump');
+        }
+    }
+
+    function triggerHurt(msg = "-1 พลังชีวิต! 💔") {
+        if (hasShield) {
+            hasShield = false;
+            player.hurtTimer = 40;
+            shakeTimer = 15;
+            shakeIntensity = 6;
+            playSound('hurt');
+            addFloatingText(player.x + player.width/2, player.y - 30, "🛡️ เกราะแตก! ป้องกันความปลอดภัยสำเร็จ", '#00d2ff');
+            return;
+        }
+
+        lives--;
+        comboCount = 0;
+        player.expression = 'hurt';
+        player.expressionTimer = 50;
+        player.hurtTimer = 40;
+        shakeTimer = 22;
+        shakeIntensity = 9;
+        playSound('hurt');
+        addFloatingText(player.x + player.width/2, player.y - 30, msg, '#ff7675');
+
+        if (lives <= 0) {
+            endGame(false);
+        }
+    }
+
+    function startGame() {
+        initAudio();
+        if (audioCtx) audioCtx.resume();
+        document.getElementById('startModal').classList.add('hidden');
+        initGame();
+        gameState = 'PLAYING';
+    }
+
+    // Split at exact designated '|' character lines for questions
+    function getQuestionLines(text) {
+        return text.split('|');
+    }
+
+    function restartGame() {
+        if (audioCtx) audioCtx.resume();
+        document.getElementById('gameOverModal').classList.add('hidden');
+        initGame();
+        gameState = 'PLAYING';
+    }
+
+    function calculateRank(finalScore) {
+        if (lives === 3 && finalScore >= 600) return "🏆 ไซเบอร์เกรด A+ : แกรนด์มาสเตอร์ไอที";
+        if (finalScore >= 500) return "🛡️ ผู้พิทักษ์เน็ตเวิร์กระดับสูง";
+        if (finalScore >= 350) return "⭐ พลเมืองไซเบอร์ขั้นยอดเยี่ยม";
+        if (finalScore >= 200) return "🤖 ไซเบอร์การ์ดฝึกหัด";
+        return "⚙️ ผู้ใช้งานคอมพิวเตอร์ทั่วไป";
+    }
+
+    function endGame(isVictory = false) {
+        gameState = 'GAMEOVER';
+        const modal = document.getElementById('gameOverModal');
+        const title = document.getElementById('modalTitle');
+        const scoreTxt = document.getElementById('modalScore');
+        const highScoreTxt = document.getElementById('modalHighScore');
+        const rankTxt = document.getElementById('modalRank');
+        const desc = document.getElementById('modalDesc');
+
+        let isNewHigh = false;
+        if (score > highScore) {
+            highScore = score;
+            isNewHigh = true;
+            try {
+                if (typeof window.localStorage !== 'undefined') {
+                    localStorage.setItem('cyber_guardian_highscore', highScore);
+                }
+            } catch (e) {
+                console.warn("ไม่สามารถเซฟ High Score ลงอุปกรณ์ได้", e);
+            }
+        }
+
+        modal.classList.remove('hidden');
+        scoreTxt.innerText = `คะแนนภารกิจที่ได้: ${score} คะแนน ⭐`;
+        highScoreTxt.innerText = isNewHigh ? `🎉 สถิติใหม่สูงสุดของระบบ! 🚀` : `สถิติสูงสุดเดิม: ${highScore} คะแนน`;
+        
+        const rank = calculateRank(score);
+        rankTxt.innerText = `ยศไซเบอร์ของคุณ: ${rank}`;
+
+        if (isVictory) {
+            title.innerText = "🏆 เคลียร์ด่านสมบูรณ์แบบ 🏆";
+            desc.innerText = "ยอดเยี่ยมมากครับผู้พิทักษ์! คุณรู้วิธีเอาตัวรอด ป้องกันตัว มารยาทสังคมออนไลน์ และเข้าใจวิธีการรับข้อมูลไอทีอย่างถูกต้อง ปลอดภัย และไม่สร้างความเสียหายให้คนอื่น! 🚀🦾";
+        } else {
+            title.innerText = "🚨 ระบบพลังงานล้มเหลว 🚨";
+            desc.innerText = "แบตเตอรี่และพลังชีวิตหมดลงแล้ว แต่ข้อมูลสารสนเทศและความปลอดภัยยังอยู่ในหัวคุณนะ! ทบทวนเรื่องรหัสผ่านปลอดภัยและลิงก์แปลกปลอม แล้วมาเริ่มกู้คืนระบบเครือข่ายใหม่อีกครั้งนะครับ! 🛠️";
+        }
+    }
+
+    // --- Game Logic Updates ---
+    function update(dt) {
+        if (gameState !== 'PLAYING') return;
+
+        if (shakeTimer > 0) shakeTimer--;
+
+        if (player.expressionTimer > 0) {
+            player.expressionTimer--;
+            if (player.expressionTimer === 0) player.expression = 'normal';
+        }
+        if (player.hurtTimer > 0) player.hurtTimer--;
+
+        // Background dust flow
+        clouds.forEach(c => {
+            c.x -= c.speed;
+            if (c.x < -200) c.x = canvas.width + 100 + Math.random()*200;
+        });
+
+        // Booster sparks
+        if (Math.random() < 0.3) {
+            spawnJetSparks(player.x + player.width/2 - 5, player.y + player.height - 2);
+        }
+
+        // Falling digital raindrops
+        if (Math.random() < 0.05) {
+            spawnSakuraPetal(cameraX + canvas.width + 50, -20);
+        }
+
+        // Fever mode matrix green storm rain
+        if (comboCount >= 3 && Math.random() < 0.15) {
+            particles.push({
+                type: 'matrix-rain',
+                x: cameraX + Math.random() * canvas.width,
+                y: -10,
+                length: 10 + Math.random() * 20,
+                vy: 5 + Math.random() * 5,
+                color: '#00ffcc'
+            });
+        }
+
+        // Handle horizontal movement physics
+        let spd = 4.8;
+        if (keys.left) {
+            player.vx = -spd;
+            player.facing = 'left';
+        } else if (keys.right) {
+            player.vx = spd;
+            player.facing = 'right';
+        } else {
+            player.vx *= 0.82;
+        }
+
+        // Low gravity mechanics
+        player.vy += 0.46;
+        if (player.vy > 14) player.vy = 14;
+
+        player.x += player.vx;
+        player.y += player.vy;
+
+        // Auto platforms gen triggers
+        if (player.x + canvas.width > platforms[platforms.length - 1].x) {
+            generateNextPlatform();
+        }
+
+        // Safe platform collisions
+        player.isGrounded = false;
+        platforms.forEach(p => {
+            if (player.x + player.width - 5 > p.x && 
+                player.x + 5 < p.x + p.width && 
+                player.y + player.height >= p.y && 
+                player.y + player.height - player.vy <= p.y + 12 && 
+                player.vy >= 0) {
+                
+                player.y = p.y - player.height;
+                player.vy = 0;
+                player.isGrounded = true;
+                player.jumpCount = 0;
+
+                if (p.type === 'normal') {
+                    player.lastSafeX = p.x + p.width / 2 - player.width / 2;
+                    player.lastSafeY = p.y - player.height;
+                }
+            }
+        });
+
+        // Collect stars
+        stars.forEach(s => {
+            if (!s.collected) {
+                let dx = (player.x + player.width/2) - s.x;
+                let dy = (player.y + player.height/2) - s.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 32) {
+                    s.collected = true;
+                    let gained = comboCount >= 3 ? 20 : 10; // Double star score in Fever mode
+                    score += gained;
+                    playSound('star');
+                    addFloatingText(s.x, s.y, `+${gained} ⭐`, '#f1c40f');
+                }
+            }
+        });
+
+        // Collect shields
+        shields.forEach(sh => {
+            if (!sh.collected) {
+                let dx = (player.x + player.width/2) - sh.x;
+                let dy = (player.y + player.height/2) - sh.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 32) {
+                    sh.collected = true;
+                    hasShield = true;
+                    playSound('shield');
+                    addFloatingText(sh.x, sh.y, "🛡️ SHIELD ONLINE", '#00d2ff');
+                }
+            }
+        });
+
+        // Answer Bubble selection triggers
+        bubbles.forEach(b => {
+            let dx = (player.x + player.width/2) - b.x;
+            let dy = (player.y + player.height/2) - b.y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+            
+            if (dist < 52) { // Adjusted collision box radius for larger bubbles
+                if (b.isCorrect) {
+                    comboCount++;
+                    let bonus = comboCount * 12;
+                    score += 50 + bonus;
+                    playSound('correct', comboCount);
+                    addFloatingText(b.x, b.y - 20, `ถูกต้อง! 🎉 +${50+bonus}`, '#2ed573');
+                    player.expression = 'happy';
+                    player.expressionTimer = 45;
+                } else {
+                    triggerHurt("ภัยบุกรุกแฮกเกอร์! 💔 (-1)");
+                }
+
+                answeredQuestionsCount++;
+
+                // Clear current station bubbles
+                bubbles = bubbles.filter(item => item.stationX !== b.stationX);
+                
+                if (answeredQuestionsCount >= totalQuestionsToWin && lives > 0) {
+                    setTimeout(() => endGame(true), 800);
+                }
+            }
+        });
+
+        // Fall recoveries
+        if (player.y > canvas.height + 100) {
+            triggerHurt("หล่นออกนอกพิกัดความถี่! 💔");
+            player.x = player.lastSafeX;
+            player.y = player.lastSafeY - 80;
+            player.vx = 0;
+            player.vy = 0;
+        }
+
+        // Particle system updates
+        particles.forEach(p => {
+            if (p.type === 'digital-petal') {
+                p.y += p.vy;
+                p.x += p.vx + Math.sin(p.y * 0.01) * 0.3;
+                p.angle += p.spinSpeed;
+            } else if (p.type === 'smoke') {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= p.decay;
+            } else if (p.type === 'cyber-star') {
+                p.rad += p.pulseSpeed;
+            } else if (p.type === 'spark') {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= p.decay;
+            } else if (p.type === 'matrix-rain') {
+                p.y += p.vy;
+            }
+        });
+
+        // Clear invalid objects from RAM arrays (Garbage Collection)
+        particles = particles.filter(p => {
+            if (p.type === 'digital-petal') return p.y < canvas.height + 20;
+            if (p.type === 'cyber-star') return true;
+            if (p.type === 'matrix-rain') return p.y < canvas.height;
+            return p.alpha > 0;
+        });
+
+        stars = stars.filter(s => !s.collected && s.x > cameraX - 150);
+        shields = shields.filter(sh => !sh.collected && sh.x > cameraX - 150);
+        bubbles = bubbles.filter(b => b.x > cameraX - 150);
+        platforms = platforms.filter(p => p.x + p.width > cameraX - 150);
+
+        floatingTexts.forEach(ft => {
+            ft.y += ft.vy;
+            ft.alpha -= 0.015;
+        });
+        floatingTexts = floatingTexts.filter(ft => ft.alpha > 0);
+
+        // Smooth Camera Follow
+        let targetCam = player.x - 200;
+        cameraX += (targetCam - cameraX) * 0.09;
+        if (cameraX < 0) cameraX = 0;
+    }
+
+    // --- Render Loop ---
+    function draw() {
+        ctx.save();
+        
+        // Handle screen shake on damages
+        if (shakeTimer > 0) {
+            let dx = (Math.random() - 0.5) * shakeIntensity;
+            let dy = (Math.random() - 0.5) * shakeIntensity;
+            ctx.translate(dx, dy);
+        }
+
+        // Draw Sky
+        if (bgGradientCache) {
+            ctx.fillStyle = bgGradientCache;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Grid lines matrix
+        ctx.strokeStyle = "rgba(0, 168, 255, 0.05)";
+        ctx.lineWidth = 1.5;
+        let gridSize = 40;
+        let offsetX = -(cameraX * 0.25) % gridSize;
+        for (let x = offsetX; x < canvas.width; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+
+        // Space starry particles
+        particles.forEach(p => {
+            if (p.type === 'cyber-star') {
+                ctx.save();
+                ctx.fillStyle = "#00d2ff";
+                ctx.globalAlpha = 0.35 + Math.sin(p.rad) * 0.45;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        });
+
+        // Parallax Satellite stations
+        clouds.forEach(c => {
+            ctx.save();
+            let renderX = ((c.x - cameraX * 0.15) % (canvas.width + 300)) - 100;
+            if(renderX < -150) renderX += (canvas.width + 300);
+            
+            ctx.translate(renderX, c.y);
+            ctx.scale(c.scale, c.scale);
+            
+            ctx.strokeStyle = "rgba(0, 168, 255, 0.25)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 25, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.fillStyle = "rgba(0, 168, 255, 0.08)";
+            ctx.fill();
+
+            ctx.strokeRect(-45, -5, 20, 10);
+            ctx.strokeRect(25, -5, 20, 10);
+            ctx.beginPath();
+            ctx.moveTo(-25, 0); ctx.lineTo(25, 0);
+            ctx.stroke();
+
+            ctx.fillStyle = Math.floor(Date.now()/300) % 2 === 0 ? "#ff4757" : "#2ed573";
+            ctx.beginPath();
+            ctx.arc(0, -25, 4, 0, Math.PI*2);
+            ctx.fill();
+
+            ctx.restore();
+        });
+
+        // Translate to world view
+        ctx.translate(-cameraX, 0);
+
+        // Draw Platforms
+        platforms.forEach(p => {
+            ctx.save();
+            
+            // Base earthy plate
+            ctx.fillStyle = "#111827";
+            ctx.strokeStyle = "rgba(0, 168, 255, 0.35)";
+            ctx.lineWidth = 2.5;
+            fillRoundRect(ctx, p.x, p.y, p.width, p.height, 16);
+            strokeRoundRect(ctx, p.x, p.y, p.width, p.height, 16);
+
+            // Glowing neon top cap
+            ctx.fillStyle = p.type === 'question' ? '#ffccd5' : '#00d2ff';
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = ctx.fillStyle;
+            fillRoundRect(ctx, p.x, p.y, p.width, 14, { topLeft: 16, topRight: 16, bottomLeft: 0, bottomRight: 0 });
+            ctx.shadowBlur = 0;
+
+            // Antenna structures
+            p.decorations.forEach(dec => {
+                ctx.save();
+                ctx.translate(p.x + dec.rx, p.y);
+                
+                ctx.strokeStyle = "#4b5563";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, -dec.height);
+                ctx.stroke();
+
+                ctx.fillStyle = dec.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = dec.color;
+                ctx.beginPath();
+                ctx.arc(0, -dec.height, 5 + Math.sin(Date.now()*0.012)*1.5, 0, Math.PI*2);
+                ctx.fill();
+                
+                ctx.restore();
+            });
+
+            // If question station, draw dialog display panels with Auto-Fit Width & Raised Height
+            if (p.type === 'question') {
+                let activeBubble = bubbles.find(b => b.stationX === p.x);
+                if (activeBubble) {
+                    currentQuestion = activeBubble.questionText;
+                    
+                    // --- PRECISE LINGUISTIC-BASED QUESTION SPLIT ---
+                    ctx.font = "bold 14.5px 'Mitr'";
+                    let qLines = getQuestionLines(currentQuestion); // Perfect split at custom pipeline symbols!
+
+                    // Measure the longest wrapped line to fit the box width dynamically
+                    let maxLineWidth = 0;
+                    qLines.forEach(line => {
+                        let w = ctx.measureText(line).width;
+                        if (w > maxLineWidth) maxLineWidth = w;
+                    });
+
+                    let bW = Math.max(380, maxLineWidth + 50); // Set auto-fitting width beautifully with healthy padding!
+                    let bH = 55 + (qLines.length * 18); // Dynamic box height based on wrapped lines
+                    let bX = p.x + p.width/2 - bW/2;
+                    let bY = p.y - 280; // Raised significantly up! (from -230 to -280) to give clean spacing
+
+                    ctx.fillStyle = "#0f172a"; // Cleaner dark navy slate
+                    ctx.strokeStyle = "#38bdf8"; // Bright cyber sky blue
+                    ctx.lineWidth = 3.5;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = "#38bdf8";
+
+                    fillRoundRect(ctx, bX, bY, bW, bH, 20);
+                    strokeRoundRect(ctx, bX, bY, bW, bH, 20);
+                    ctx.shadowBlur = 0;
+
+                    // Grid details inside banner
+                    ctx.fillStyle = "rgba(56, 189, 248, 0.06)";
+                    for (let sy = bY + 4; sy < bY + bH; sy += 4) {
+                        ctx.fillRect(bX + 4, sy, bW - 8, 1.5);
+                    }
+
+                    // Texts inside question board (Bright, Bold & Highly Visible)
+                    ctx.fillStyle = "#f43f5e"; // Ultra bright rose pink for header
+                    ctx.font = "bold 15px 'Chakra Petch'";
+                    ctx.textAlign = "center";
+                    ctx.fillText(`🚨 CYBER CHALLENGE: LEVEL GRADE 5`, p.x + p.width/2, bY + 24);
+                    
+                    // Core Question Lines (Bright, Crisp, and Highly Visible White)
+                    ctx.font = "bold 14.5px 'Mitr'";
+                    ctx.fillStyle = "#ffffff"; 
+                    for (let i = 0; i < qLines.length; i++) {
+                        ctx.fillText(qLines[i], p.x + p.width/2, bY + 46 + (i * 18));
+                    }
+                }
+            }
+
+            ctx.restore();
+        });
+
+        // Star collectibles
+        stars.forEach(s => {
+            ctx.save();
+            ctx.fillStyle = "#f1c40f";
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#f1c40f";
+            ctx.beginPath();
+            ctx.translate(s.x, s.y + Math.sin(Date.now()*0.005 + s.x)*5);
+            for (let i = 0; i < 5; i++) {
+                ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * 12, -Math.sin((18 + i * 72) * Math.PI / 180) * 12);
+                ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * 5, -Math.sin((54 + i * 72) * Math.PI / 180) * 5);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        });
+
+        // Shields items
+        shields.forEach(sh => {
+            ctx.save();
+            ctx.translate(sh.x, sh.y + Math.sin(Date.now()*0.006 + sh.x)*6);
+            ctx.fillStyle = "#00d2ff";
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#00d2ff";
+            
+            ctx.beginPath();
+            ctx.moveTo(0, -12);
+            ctx.lineTo(10, -12);
+            ctx.lineTo(10, 2);
+            ctx.quadraticCurveTo(10, 12, 0, 16);
+            ctx.quadraticCurveTo(-10, 12, -10, 2);
+            ctx.lineTo(-10, -12);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(-2, -8, 4, 16);
+            ctx.fillRect(-6, -4, 12, 4);
+
+            ctx.restore();
+        });
+
+        // Answer Holobubbles - Revamped to Light, Neon-Glow Pastel Backgrounds for crisp Dark Text Contrast
+        bubbles.forEach(b => {
+            ctx.save();
+            
+            let timeFactor = Date.now() * 0.004 + b.wobbleSeed;
+            let scaleX = 1 + Math.sin(timeFactor) * 0.06;
+            let scaleY = 1 + Math.cos(timeFactor) * 0.06;
+
+            ctx.translate(b.x, b.y);
+            ctx.scale(scaleX, scaleY);
+
+            // Light-glowing backgrounds matching the bubble choices
+            ctx.fillStyle = b.color; // e.g. soft neon pink, green, blue
+            ctx.strokeStyle = b.glowColor; // Glowing neon outlines
+            ctx.lineWidth = 4;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = b.glowColor;
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, 54, 0, Math.PI*2); // Expanded size slightly to 54px for comfortable margins
+            ctx.fill();
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Subtle inner ring to maintain depth
+            ctx.strokeStyle = "rgba(0, 0, 0, 0.08)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(0, 0, 46, 0, Math.PI*2);
+            ctx.stroke();
+
+            // Shiny glass refraction sphere reflection
+            ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
+            ctx.beginPath();
+            ctx.arc(-18, -18, 10, 0, Math.PI*2);
+            ctx.fill();
+
+            // Render high-contrast dark text inside the light-colored bubble
+            drawBubbleText(ctx, b.text, 0, 0);
+
+            ctx.restore();
+        });
+
+        // Falling particles
+        particles.forEach(p => {
+            ctx.save();
+            if (p.type === 'digital-petal') {
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = p.color;
+                ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+            } else if (p.type === 'smoke') {
+                ctx.fillStyle = p.color || `rgba(0, 168, 255, ${p.alpha})`;
+                ctx.globalAlpha = p.alpha;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+                ctx.fill();
+            } else if (p.type === 'spark') {
+                ctx.fillStyle = `rgba(0, 210, 255, ${p.alpha})`;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+            } else if (p.type === 'matrix-rain') {
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x, p.y + p.length);
+                ctx.stroke();
+            }
+            ctx.restore();
+        });
+
+        // --- DRAW ROBOT GUARDIAN ---
+        ctx.save();
+        if (player.hurtTimer > 0 && Math.floor(player.hurtTimer / 3) % 2 === 0) {
+            ctx.globalAlpha = 0.35;
+        }
+        
+        ctx.translate(player.x + player.width/2, player.y + player.height/2);
+
+        if (player.facing === 'left') {
+            ctx.scale(-1, 1);
+        }
+
+        // Antenna
+        ctx.strokeStyle = '#6b7280';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, -22);
+        let antWiggle = Math.sin(Date.now() * 0.012) * 3;
+        ctx.lineTo(antWiggle, -35);
+        ctx.stroke();
+
+        ctx.fillStyle = comboCount >= 3 ? '#ff4757' : '#00d2ff';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.beginPath();
+        ctx.arc(antWiggle, -37, 5 + Math.sin(Date.now()*0.01)*2, 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Robot Head
+        ctx.fillStyle = '#f3f4f6';
+        ctx.strokeStyle = '#9ca3af';
+        ctx.lineWidth = 2.5;
+        fillRoundRect(ctx, -20, -22, 40, 24, 10);
+        strokeRoundRect(ctx, -20, -22, 40, 24, 10);
+
+        // Screen display
+        ctx.fillStyle = '#111827';
+        fillRoundRect(ctx, -15, -18, 30, 16, 5);
+
+        // Face Glow
+        ctx.fillStyle = comboCount >= 3 ? '#f1c40f' : '#00d2ff';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = ctx.fillStyle;
+        
+        if (player.expression === 'normal') {
+            ctx.fillRect(-9, -14, 5, 5);
+            ctx.fillRect(4, -14, 5, 5);
+            ctx.fillRect(-3, -7, 6, 2);
+        } else if (player.expression === 'happy') {
+            ctx.font = "bold 10px monospace";
+            ctx.fillText("^", -9, -8);
+            ctx.fillText("^", 3, -8);
+            ctx.fillRect(-3, -6, 6, 2);
+        } else if (player.expression === 'hurt') {
+            ctx.fillStyle = '#ff7675';
+            ctx.shadowColor = '#ff7675';
+            ctx.font = "bold 12px 'Chakra Petch'";
+            ctx.textAlign = 'center';
+            ctx.fillText("x", -6, -8);
+            ctx.fillText("x", 6, -8);
+            ctx.fillRect(-4, -5, 8, 2);
+        }
+        ctx.shadowBlur = 0;
+
+        // Neck joint
+        ctx.fillStyle = '#374151';
+        ctx.fillRect(-6, 2, 12, 4);
+
+        // Body metallic plate
+        if (comboCount >= 3) {
+            let hue = (Date.now() / 8) % 360;
+            ctx.fillStyle = `hsl(${hue}, 85%, 70%)`;
+            ctx.strokeStyle = `hsl(${hue}, 85%, 45%)`;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = ctx.fillStyle;
+        } else {
+            ctx.fillStyle = '#e5e7eb';
+            ctx.strokeStyle = '#9ca3af';
+        }
+        
+        ctx.lineWidth = 2.5;
+        fillRoundRect(ctx, -17, 6, 34, 22, 8);
+        strokeRoundRect(ctx, -17, 6, 34, 22, 8);
+        ctx.shadowBlur = 0;
+
+        // Power Core
+        let corePulse = 4 + Math.sin(Date.now() * 0.015) * 2;
+        ctx.fillStyle = hasShield ? '#00d2ff' : (comboCount >= 3 ? '#ff3f34' : '#00e676');
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.beginPath();
+        ctx.arc(0, 17, corePulse, 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Arms/Shoulders
+        ctx.fillStyle = '#4b5563';
+        ctx.fillRect(-22, 8, 5, 8);
+        ctx.fillRect(17, 8, 5, 8);
+
+        // Foot Jet pack
+        ctx.fillStyle = '#1f2937';
+        ctx.fillRect(-12, 28, 24, 6);
+
+        // --- HELPER FLYING DRONE (CUTE SAT COMPANION) ---
+        ctx.save();
+        let droneY = -15 + Math.sin(Date.now() * 0.008) * 6;
+        ctx.translate(-35, droneY);
+        ctx.fillStyle = '#e5e7eb';
+        ctx.strokeStyle = '#9ca3af';
+        ctx.lineWidth = 1.5;
+        fillRoundRect(ctx, -10, -10, 20, 14, 6);
+        strokeRoundRect(ctx, -10, -10, 20, 14, 6);
+        
+        ctx.fillStyle = '#00d2ff';
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = '#00d2ff';
+        ctx.beginPath();
+        ctx.arc(0, -2, 3.5, 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+
+        // Shields Protection bubble visual ring
+        if (hasShield) {
+            ctx.strokeStyle = "rgba(0, 210, 255, 0.8)";
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#00d2ff";
+            ctx.beginPath();
+            ctx.ellipse(0, 5, 34, 42, Math.sin(Date.now() * 0.015) * 0.2, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+
+        ctx.restore();
+
+        // Floating notifications texts
+        floatingTexts.forEach(ft => {
+            ctx.save();
+            ctx.globalAlpha = ft.alpha;
+            ctx.fillStyle = ft.color;
+            ctx.font = "bold 18px 'Mitr'";
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = "rgba(0,0,0,0.4)";
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.restore();
+        });
+
+        ctx.restore();
+
+        // Draw Static non-scrolling UI controls
+        drawHUD();
+    }
+
+    function drawHUD() {
+        // Holographic display header
+        ctx.fillStyle = "rgba(10, 15, 30, 0.95)"; // Slightly darker slate for HUD
+        ctx.fillRect(0, 0, canvas.width, 56);
+        ctx.strokeStyle = "#00a8ff";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 56); ctx.lineTo(canvas.width, 56);
+        ctx.stroke();
+
+        ctx.font = "bold 16px 'Chakra Petch'";
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#ffffff"; // Crisp pure white for label text
+        ctx.fillText(`BATTERY (LIVES):`, 20, 35);
+        let hearts = "";
+        for(let l = 0; l < 3; l++) hearts += (l < lives) ? "🟢" : "🔴";
+        ctx.fillText(hearts, 160, 33);
+
+        ctx.fillStyle = "#38bdf8"; // Bright cyber sky blue for shield
+        ctx.fillText(`SHIELD: ${hasShield ? "ACTIVE 🛡️" : "OFFLINE 🔌"}`, 280, 35);
+
+        ctx.fillStyle = "#f1c40f"; // Golden yellow for score
+        ctx.fillText(`SCORE: ${score} ⭐`, 530, 35);
+
+        ctx.fillStyle = "#a1c4fd"; // Bright soft purple-blue for progress
+        ctx.fillText(`PROGRESS: ${answeredQuestionsCount}/${totalQuestionsToWin} 🗺️`, 700, 35);
+
+        // Dynamic rainbow blinks on hyper speed
+        if (comboCount >= 3) {
+            ctx.save();
+            ctx.textAlign = "right";
+            ctx.font = "bold 15px 'Chakra Petch'";
+            let colorPool = ['#ff4757','#f1c40f','#2ed573','#00d2ff','#9b59b6'];
+            ctx.fillStyle = colorPool[Math.floor(Date.now()/100) % colorPool.length];
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.fillText(`⚡ HYPER DRIVE COMBO X${comboCount} ⚡`, canvas.width - 20, 35);
+            ctx.restore();
+        }
+    }
+
+    // --- Responsive Scaling Viewport Engine ---
+    function scaleViewport() {
+        const wrapper = document.getElementById('gameWrapper');
+        const winW = window.innerWidth;
+        const winH = window.innerHeight;
+        const targetRatio = 16 / 9;
+
+        let w = winW;
+        let h = winW / targetRatio;
+
+        if (h > winH) {
+            h = winH;
+            w = winH * targetRatio;
+        }
+
+        wrapper.style.width = w + 'px';
+        wrapper.style.height = h + 'px';
+    }
+
+    window.addEventListener('resize', scaleViewport);
+    window.addEventListener('load', scaleViewport);
+    scaleViewport();
+
+    // --- Core Cycle Animation ---
+    let lastTime = performance.now();
+    function gameLoop(currentTime) {
+        let dt = (currentTime - lastTime) / 16.666;
+        if (dt > 4) dt = 4;
+        lastTime = currentTime;
+
+        update(dt);
+        draw();
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    requestAnimationFrame(gameLoop);
+
+</script>
+</body>
+</html>
